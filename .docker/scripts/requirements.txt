@@ -24,6 +24,7 @@ tensorboard
 transformers==4.34.*
 tqdm
 wandb
+xformers
 
 git+https://github.com/oobabooga/torch-grammar.git
 
