@@ -48,6 +48,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install -r ./scripts/requirements-base.txt \
     --extra-index-url https://download.pytorch.org/whl/${TORCH_CUDNN}
 
+RUN cp ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cuda118.so ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cpu.so
+
 #### Runtime stage ---------------------------------------
 
 # Runtime image (copy built virtual environment)
