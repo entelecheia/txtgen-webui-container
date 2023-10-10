@@ -1,0 +1,64 @@
+# Changes here will be overwritten by Copier; do NOT edit manually
+_commit: v0.23.5
+_src_path: gh:entelecheia/hyperfast-docker-template
+app_dirname: txtgen-webui
+app_install_root: /opt
+app_service_name: app
+app_source_branch: main
+app_source_repo: entelecheia/text-generation-webui
+author: Young Joon Lee
+build_images_from_dockerfile: true
+clone_source_code: true
+container_workspace_root: /workspace
+copy_scripts_dir: true
+cuda_device_id: '4'
+docker_app_image_variant_name: app
+docker_apt_packages: fontconfig fonts-nanum libportaudio2 libasound-dev make g++ ffmpeg
+docker_base_build_from: nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04
+docker_base_image_variant_name: base
+docker_container_uid: 9001
+docker_container_username: app
+docker_name_prefix: TXTGEN_WEBUI
+docker_project_name: txtgen-webui
+docker_registry: ghcr.io
+docker_run_command: bash
+docker_service_name: workspace
+docker_timezone: Asia/Seoul
+docker_username: entelecheia
+email: entelecheia@hotmail.com
+enable_nvidia_gpu: true
+friendly_name: Text generation web UI Container
+github_repo_name: txtgen-webui-container
+github_username: entelecheia
+install_dotfiles: false
+install_pip_requirements: true
+jupyter_host_port: 18888
+jupyter_port: 8585
+jupyter_token: __juypter_token_(change_me)__
+launch_scripts: launch.sh
+main_branch: main
+pip_command: pip3
+project_description: '`txtgen-webui-container` is a Docker container that provides
+    an easy way to launch the text-generation-webui web UI for Large Language Models
+    like GPT-3, GPT-J, OPT, GALACTICA, and more. It supports features like notebook
+    mode, chat mode, switching between different models, and generating HTML/Markdown
+    output. The container handles installing dependencies and launching the UI with
+    GPU acceleration support. Persistent storage can be enabled to save datasets,
+    models, and other files across container restarts. txtgen-webui-container aims
+    to make exploring AI text generation models accessible to everyone through an
+    intuitive web interface.'
+project_license: MIT
+project_short_description: A Docker container for text-generation-webui, a Gradio
+    web UI for running Large Language Models like GPT-J, OPT, GALACTICA, LLaMA, and
+    Pygmalion.
+python_command: python3.10
+ssh_host_port: 2722
+ssh_port: 22
+use_builder_image_and_copy_venv: true
+use_deploy_workflows: true
+use_jupyter: false
+use_ssh_service: true
+use_web_service: true
+web_service_host_port: 17860
+web_service_port: 7860
+
