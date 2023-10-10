@@ -34,6 +34,9 @@ ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/.venvs/${APP_DIRNAME}
 ENV APP_WORKSPACE_ROOT=${APP_INSTALL_ROOT}/workspace
 ENV PATH="$APP_VIRTUAL_ENV/bin:$PATH"
 
+ARG ARG_TORCH_CUDNN=cu118
+ENV TORCH_CUDNN=$ARG_TORCH_CUDNN
+
 # Create the app directory
 RUN mkdir -p $APP_INSTALL_ROOT
 WORKDIR $APP_INSTALL_ROOT
@@ -42,7 +45,8 @@ COPY ./.docker/scripts/ ./scripts/
 # Install pytorch before all other pip packages
 RUN --mount=type=cache,target=/root/.cache/pip \
     python3.10 -m venv ${APP_VIRTUAL_ENV} &&\
-    pip install -r ./scripts/requirements-base.txt
+    pip install -r ./scripts/requirements-base.txt \
+    --extra-index-url https://download.pytorch.org/whl/${TORCH_CUDNN}
 
 #### Runtime stage ---------------------------------------
 
