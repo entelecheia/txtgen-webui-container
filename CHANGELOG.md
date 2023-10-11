@@ -1,5 +1,12 @@
 <!--next-version-placeholder-->
 
+## v0.7.0 (2023-10-11)
+
+### Feature
+
+* **docker:** Optimize dockerfile for txtgen-webui app ([`afb62f8`](https://github.com/entelecheia/txtgen-webui-container/commit/afb62f822537c78af299c41ac2fd85f842081d5c))
+* **docker:** Add APP_SOURCE_REPO and APP_SOURCE_BRANCH environment variables ([`b1895da`](https://github.com/entelecheia/txtgen-webui-container/commit/b1895dad01d09d542123739bd9ab2a9372a5987e))
+
 ## v0.6.0 (2023-10-11)
 
 ### Feature
