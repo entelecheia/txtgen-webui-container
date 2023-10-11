@@ -14,13 +14,10 @@ services:
         ARG_USERNAME: $CONTAINER_USERNAME
         ARG_USER_UID: $CONTAINER_USER_UID
         ARG_USER_GID: $CONTAINER_USER_GID
-        ARG_WORKSPACE_ROOT: $CONTAINER_WORKSPACE_ROOT
         ARG_APP_SOURCE_REPO: $APP_SOURCE_REPO
         ARG_APP_INSTALL_ROOT: $APP_INSTALL_ROOT
         ARG_APP_DIRNAME: $APP_DIRNAME
         ARG_APP_SOURCE_BRANCH: $APP_SOURCE_BRANCH
-        ARG_APP_SERVICE_NAME: $APP_SERVICE_NAME
-        ARG_DOTFILES_VERSION: $DOTFILES_VERSION
     # Sets the image name for the built image
     image: $IMAGE_NAME:$IMAGE_TAG
     # Sets the hostname of the container
@@ -33,8 +30,6 @@ services:
     environment:
       USER_UID: $CONTAINER_USER_UID
       USER_GID: $CONTAINER_USER_GID
-      WORKSPACE_LOCATION: $CONTAINER_WORKSPACE_LOCATION
-      WORKSPACE_ROOT: $CONTAINER_WORKSPACE_ROOT
       SSH_PUB_KEY: $SSH_PUB_KEY
       IMAGE_VARIANT: $IMAGE_VARIANT
       CLI_ARGS: $APP_CLI_ARGS
@@ -52,15 +47,15 @@ services:
       - "$HOST_API_STREAM_PORT:$CONTAINER_API_STREAM_PORT"
     volumes:
       # Maps directories from the host to the container
-      - "$PWD/.docker/scripts:$APP_WORKSPACE_ROOT/scripts"
+      - "$PWD/.docker/scripts:$APP_INSTALL_ROOT/scripts"
       - ${HF_HOME}:${APP_HF_HOME}
-      - $PWD/workspace/characters:$APP_SRC_DIR/characters
-      - $PWD/workspace/loras:$APP_SRC_DIR/loras
-      - $PWD/workspace/models:$APP_SRC_DIR/models
-      - $PWD/workspace/presets:$APP_SRC_DIR/presets
-      - $PWD/workspace/prompts:$APP_SRC_DIR/prompts
-      - $PWD/workspace/softprompts:$APP_SRC_DIR/softprompts
-      - $PWD/workspace/training:$APP_SRC_DIR/training
+      - $PWD/workspace/characters:$APP_DIR/characters
+      - $PWD/workspace/loras:$APP_DIR/loras
+      - $PWD/workspace/models:$APP_DIR/models
+      - $PWD/workspace/presets:$APP_DIR/presets
+      - $PWD/workspace/prompts:$APP_DIR/prompts
+      - $PWD/workspace/softprompts:$APP_DIR/softprompts
+      - $PWD/workspace/training:$APP_DIR/training
     deploy:
       resources:
         reservations:
