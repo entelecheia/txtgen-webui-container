@@ -12,7 +12,7 @@ scipy
 sentence_transformers
 sentencepiece
 tensorboard
-torch==2.0.1
+torch==2.1.0
 torchaudio
 torchvision
 transformers==4.34.*
