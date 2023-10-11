@@ -104,10 +104,10 @@ RUN mkdir -p $WORKSPACE_ROOT/projects
 ENV PATH="$APP_VIRTUAL_ENV/bin:$PATH"
 
 # Copy the virtual environment from the builder stage
-COPY --link --from=builder ${APP_VIRTUAL_ENV} ${APP_VIRTUAL_ENV}
+COPY --from=builder ${APP_VIRTUAL_ENV} ${APP_VIRTUAL_ENV}
 
 # Copy and install GPTQ-for-LLaMa
-COPY --link --from=builder /build ${APP_INSTALL_ROOT}/repositories/GPTQ-for-LLaMa
+COPY --from=builder /build ${APP_INSTALL_ROOT}/repositories/GPTQ-for-LLaMa
 RUN --mount=type=cache,target=/root/.cache/pip,rw \
     pip3 install ${APP_INSTALL_ROOT}/repositories/GPTQ-for-LLaMa/*.whl
 
