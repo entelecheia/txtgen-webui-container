@@ -14,7 +14,6 @@ USER_GID=${USER_GID:-1000}
 USER=${USERNAME:-app}
 usermod -u "${USER_UID}" "${USER}"
 groupmod -g "${USER_GID}" "${USER}"
-chown --recursive "${USER_UID}:${USER_GID}" "${WORKSPACE_ROOT}"
 chown --recursive "${USER_UID}:${USER_GID}" "${APP_INSTALL_ROOT}"
 
 ### Set the $PUBLIC_KEY env var to enable SSH access.
@@ -30,4 +29,4 @@ fi
 cd "${APP_SRC_DIR}" || echo "Failed to change directory to ${APP_SRC_DIR}. Continuing..."
 
 # Run the CMD as the Container User (not root).
-exec gosu "${USER}" python3 server.py --listen --api
+exec gosu "${USER}" python3 server.py ${CLI_ARGS}
