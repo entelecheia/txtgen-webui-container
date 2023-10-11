@@ -15,19 +15,17 @@ usermod -u "${USER_UID}" "${USER}"
 groupmod -g "${USER_GID}" "${USER}"
 chown --recursive "${USER_UID}:${USER_GID}" "${WORKSPACE_ROOT}"
 
-# start ssh server
-sudo service ssh start
-# Clones the app repository from GitHub
-if [[ "${VARIANT}" == "app" ]]; then
-    if [ ! -d "${APP_INSTALL_ROOT}/${APP_DIRNAME}" ]; then
-        # clone app repo
-        echo "Cloning app repo"
-        echo "from ${APP_SOURCE_REPO} to ${APP_INSTALL_ROOT}/${APP_DIRNAME}"
-        git clone "https://github.com/${APP_SOURCE_REPO}.git" "$APP_INSTALL_ROOT/${APP_DIRNAME}"
-    else
-        echo "App repo already cloned"
-    fi
-    # install app dependencies
-    # pip install -r $APP_INSTALL_ROOT/$APP_DIRNAME/requirements.txt
+### Set the $PUBLIC_KEY env var to enable SSH access.
+# It is useful to have the full SSH server e.g. on Runpod.
+# (use SCP to copy files to/from the image, etc)
+if [[ -n "$SSH_PUB_KEY" ]] && [[ ! -d "${HOME}/.ssh" ]]; then
+    mkdir -p "${HOME}/.ssh"
+    echo "${SSH_PUB_KEY}" > "${HOME}/.ssh/authorized_keys"
+    chmod -R 700 "${HOME}/.ssh"
+    service ssh start
 fi
 
+cd "${APP_SRC_DIR}" || echo "Failed to change directory to ${APP_SRC_DIR}. Continuing..." && exit 1
+
+# Run the CMD as the Container User (not root).
+exec gosu "${USER}" python3 server "${CLI_ARGS}"
