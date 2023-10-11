@@ -1,6 +1,7 @@
 #!/bin/bash
 # add your custom commands here that should be executed every time the docker container starts
 echo "Starting docker container..."
+export
 
 ### Set the USER_UID envvar to match your user.
 # Ensures files created in the container are owned by you:
@@ -13,7 +14,7 @@ USER_GID=${USER_GID:-1000}
 USER=${USERNAME:-app}
 usermod -u "${USER_UID}" "${USER}"
 groupmod -g "${USER_GID}" "${USER}"
-chown --recursive "${USER_UID}:${USER_GID}" "${WORKSPACE_ROOT}"
+chown --recursive "${USER_UID}:${USER_GID}" "${APP_INSTALL_ROOT}"
 
 ### Set the $PUBLIC_KEY env var to enable SSH access.
 # It is useful to have the full SSH server e.g. on Runpod.
@@ -25,7 +26,7 @@ if [[ -n "$SSH_PUB_KEY" ]] && [[ ! -d "${HOME}/.ssh" ]]; then
     service ssh start
 fi
 
-cd "${APP_SRC_DIR}" || echo "Failed to change directory to ${APP_SRC_DIR}. Continuing..." && exit 1
+cd "${APP_SRC_DIR}" || echo "Failed to change directory to ${APP_SRC_DIR}. Continuing..."
 
 # Run the CMD as the Container User (not root).
-exec gosu "${USER}" python3 server "${CLI_ARGS}"
+exec gosu "${USER}" python3 server.py ${CLI_ARGS}
