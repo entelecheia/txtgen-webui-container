@@ -36,14 +36,12 @@ services:
     environment:
       USER_UID: $CONTAINER_USER_UID
       USER_GID: $CONTAINER_USER_GID
-      USER_FULLNAME: $APP_USER_FULLNAME
-      USER_EMAIL: $APP_USER_EMAIL
       GITHUB_USERNAME: $APP_GITHUB_USERNAME
       WORKSPACE_LOCATION: $CONTAINER_WORKSPACE_LOCATION
       WORKSPACE_ROOT: $CONTAINER_WORKSPACE_ROOT
-      SYSTEM_HOSTNAME: $CONTAINER_HOSTNAME
+      SSH_PUB_KEY: $SSH_PUB_KEY
       IMAGE_VARIANT: $IMAGE_VARIANT
-      GIT_COMMIT_GPGSIGN: $GIT_COMMIT_GPGSIGN
+      CLI_ARGS: $APP_CLI_ARGS
     ulimits:
       # Sets the stack size and memory lock limits
       stack: 67108864
@@ -54,9 +52,19 @@ services:
       # Maps the container's SSH and Web service ports to the host's ports
       - "$HOST_SSH_PORT:$CONTAINER_SSH_PORT"
       - "$HOST_WEB_SVC_PORT:$CONTAINER_WEB_SVC_PORT"
+      - "$HOST_API_PORT:$CONTAINER_API_PORT"
+      - "$HOST_API_STREAM_PORT:$CONTAINER_API_STREAM_PORT"
     volumes:
       # Maps directories from the host to the container
       - "$PWD/.docker/scripts:$CONTAINER_WORKSPACE_ROOT/scripts"
+      - ${HF_HOME}:${APP_HF_HOME}
+      - $PWD/workspace/characters:$APP_SRC_DIR/characters
+      - $PWD/workspace/loras:$APP_SRC_DIR/loras
+      - $PWD/workspace/models:$APP_SRC_DIR/models
+      - $PWD/workspace/presets:$APP_SRC_DIR/presets
+      - $PWD/workspace/prompts:$APP_SRC_DIR/prompts
+      - $PWD/workspace/softprompts:$APP_SRC_DIR/softprompts
+      - $PWD/workspace/training:$APP_SRC_DIR/training
     deploy:
       resources:
         reservations:
