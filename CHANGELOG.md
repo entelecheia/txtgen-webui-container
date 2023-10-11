@@ -1,5 +1,18 @@
 <!--next-version-placeholder-->
 
+## v0.3.0 (2023-10-11)
+
+### Feature
+
+* **docker:** Map new directories from host to container ([`926b129`](https://github.com/entelecheia/txtgen-webui-container/commit/926b129e752be32b5cec253d87cef83c86491b41))
+* **softprompts:** Add .gitkeep file ([`bbf55dc`](https://github.com/entelecheia/txtgen-webui-container/commit/bbf55dc1fc3a90295831f11d50cc7564750fd27a))
+* **training:** Add new datasets and format files ([`249923c`](https://github.com/entelecheia/txtgen-webui-container/commit/249923cdba515456de4adc05d65d7352893a96dc))
+* **workspace:** Add new characters and conversation samples ([`8c7f865`](https://github.com/entelecheia/txtgen-webui-container/commit/8c7f865a77f20469f56e50625f5f7c473de16432))
+* **docker:** Add xformers package installation ([`80b945d`](https://github.com/entelecheia/txtgen-webui-container/commit/80b945ddab3f639c410dbbd66aaee71793ef72ee))
+* **docker:** Add huggingface cache directory and ssh public key configurations ([`73b09ae`](https://github.com/entelecheia/txtgen-webui-container/commit/73b09ae754280e5b98617d340e15aa78a8800503))
+* **docker:** Add new configuration parameters for API_PORT and API_STREAM_PORT ([`2a1c9d0`](https://github.com/entelecheia/txtgen-webui-container/commit/2a1c9d00352cf912c4ae06baafb13bb278a4b41d))
+* **docker:** Add new volume mappings and port mappings in docker-compose.app.yaml ([`387b1be`](https://github.com/entelecheia/txtgen-webui-container/commit/387b1be362941bc6c4997f1049b858cd342fffc9))
+
 ## v0.2.0 (2023-10-10)
 
 ### Feature
