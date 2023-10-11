@@ -1,9 +1,8 @@
 # Sets the base image for subsequent instructions
-ARG ARG_BUILD_FROM="nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04"
-ARG ARG_DEV_BUILD_FROM="nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04"                                     # The base image for the Docker build
+ARG ARG_BUILD_FROM="nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04"                                     # The base image for the Docker build
 
 ## Builder stage
-FROM $ARG_DEV_BUILD_FROM as builder-base
+FROM $ARG_BUILD_FROM as builder-base
 
 # Setting this argument prevents interactive prompts during the build process
 ARG DEBIAN_FRONTEND=noninteractive
@@ -33,7 +32,7 @@ ENV TORCH_CUDNN=$ARG_TORCH_CUDNN
 RUN --mount=type=cache,target=/root/.cache/pip \
     python3.10 -m venv ${APP_VIRTUAL_ENV} &&\
     pip install --upgrade pip setuptools wheel ninja && \
-    pip install  torch torchvision torchaudio \
+    pip install torch torchvision torchaudio \
     --extra-index-url https://download.pytorch.org/whl/${TORCH_CUDNN}
 
 #### App builder stage ---------------------------------------
