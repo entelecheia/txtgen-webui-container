@@ -1,16 +1,16 @@
 # Sets the base image for subsequent instructions
 ARG ARG_BUILD_FROM="nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04"
+ARG ARG_DEV_BUILD_FROM="nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04"                                     # The base image for the Docker build
 
-FROM $ARG_BUILD_FROM
+## Builder stage
+FROM $ARG_DEV_BUILD_FROM as builder
 
 # Setting this argument prevents interactive prompts during the build process
 ARG DEBIAN_FRONTEND=noninteractive
 # Updates the image and installs necessary packages
 RUN apt-get update --fix-missing \
-    && apt-get install -y curl wget jq sudo gosu git \
-    python3.10-venv python3-pip build-essential \
-    locales locales-all fontconfig fonts-nanum libportaudio2 libasound-dev make g++ ffmpeg \
-    tzdata openssh-server \
+    && apt-get install -y curl git \
+    python3.10-venv python3-dev build-essential \
     # Cleans up unnecessary packages to reduce image size
     && apt-get autoremove -y \
     && apt-get clean -y
@@ -33,11 +33,6 @@ ENV APP_DIRNAME $ARG_APP_DIRNAME
 ENV APP_SRC_DIR=${APP_INSTALL_ROOT}/${APP_DIRNAME}
 ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/venv
 ENV APP_WORKSPACE_ROOT=${APP_INSTALL_ROOT}/workspace
-ARG ARG_WORKSPACE_ROOT="/workspace"
-ENV WORKSPACE_ROOT $ARG_WORKSPACE_ROOT
-# Sets up the workspace for the user
-RUN mkdir -p $WORKSPACE_ROOT/projects
-
 ENV PATH="$APP_VIRTUAL_ENV/bin:$PATH"
 
 ARG ARG_TORCH_CUDNN=cu118
@@ -51,12 +46,70 @@ COPY ./.docker/scripts/ ./scripts/
 # Install pytorch before all other pip packages
 RUN --mount=type=cache,target=/root/.cache/pip \
     python3.10 -m venv ${APP_VIRTUAL_ENV} &&\
+    pip3 install --upgrade pip setuptools wheel && \
     pip install -r ./scripts/requirements-base.txt \
-    --extra-index-url https://download.pytorch.org/whl/${TORCH_CUDNN}
-RUN --mount=type=cache,target=/root/.cache/pip \
+    --extra-index-url https://download.pytorch.org/whl/${TORCH_CUDNN} && \
     pip install xformers
 
-RUN cp ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cuda118.so ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cpu.so
+RUN git clone --depth=1 https://github.com/oobabooga/GPTQ-for-LLaMa /build
+
+WORKDIR /build
+
+# ARG TORCH_CUDA_ARCH_LIST="Kepler;Kepler+Tesla;Maxwell;Maxwell+Tegra;Pascal;Volta;Turing"
+ARG ARG_TORCH_CUDA_ARCH_LIST="6.1;6.2;7.0;7.5;8.0;8.6"
+ENV TORCH_CUDA_ARCH_LIST="${ARG_TORCH_CUDA_ARCH_LIST}"
+RUN python3 setup_cuda.py bdist_wheel -d .
+
+#### Runtime stage ---------------------------------------
+
+# Runtime image (copy built virtual environment)
+FROM $ARG_BUILD_FROM AS runtime
+
+
+# Sets labels for the image
+LABEL org.opencontainers.image.source="https://github.com/entelecheia/txtgen-webui-container"
+LABEL org.opencontainers.image.description="A Docker container for text-generation-webui, a Gradio web UI for running Large Language Models like GPT-J, OPT, GALACTICA, LLaMA, and Pygmalion."
+LABEL org.opencontainers.image.licenses="MIT"
+
+# Setting this argument prevents interactive prompts during the build process
+ARG DEBIAN_FRONTEND=noninteractive
+# Updates the image and installs necessary packages
+RUN apt-get update --fix-missing \
+    && apt-get install -y curl wget jq sudo gosu git \
+    python3.10-venv python3-dev python3-pip build-essential \
+    locales locales-all fontconfig fonts-nanum libportaudio2 libasound-dev make g++ ffmpeg \
+    tzdata openssh-server \
+    # Cleans up unnecessary packages to reduce image size
+    && apt-get autoremove -y \
+    && apt-get clean -y
+
+# Sets Python environment variables
+ENV PIP_DEFAULT_TIMEOUT 100
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Setting ARGs and ENVs for the app
+ARG ARG_APP_INSTALL_ROOT="/opt"
+ARG ARG_APP_DIRNAME="txtgen-webui"
+ENV APP_INSTALL_ROOT $ARG_APP_INSTALL_ROOT
+ENV APP_DIRNAME $ARG_APP_DIRNAME
+ENV APP_SRC_DIR=${APP_INSTALL_ROOT}/${APP_DIRNAME}
+ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/venv
+ENV APP_WORKSPACE_ROOT=${APP_INSTALL_ROOT}/workspace
+ARG ARG_WORKSPACE_ROOT="/workspace"
+ENV WORKSPACE_ROOT $ARG_WORKSPACE_ROOT
+# Sets up the workspace for the user
+RUN mkdir -p $WORKSPACE_ROOT/projects
+
+ENV PATH="$APP_VIRTUAL_ENV/bin:$PATH"
+
+# Copy the virtual environment from the builder stage
+COPY --from=builder ${APP_VIRTUAL_ENV} ${APP_VIRTUAL_ENV}
+
+# Copy and install GPTQ-for-LLaMa
+COPY --from=builder /build ${APP_INSTALL_ROOT}/repositories/GPTQ-for-LLaMa
+RUN --mount=type=cache,target=/root/.cache/pip,rw \
+    pip3 install ${APP_INSTALL_ROOT}/repositories/GPTQ-for-LLaMa/*.whl
 
 # Sets the time zone within the container
 ENV TZ="Asia/Seoul"

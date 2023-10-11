@@ -39,6 +39,8 @@ RUN git clone --branch $APP_SOURCE_BRANCH https://github.com/${ARG_APP_SOURCE_RE
 RUN --mount=type=cache,target=/root/.cache/pip,rw \
     pip3 install -r $APP_SRC_DIR/requirements.txt
 
+RUN cp ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cuda118.so ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cpu.so
+
 # Install extension requirements
 RUN --mount=type=cache,target=/root/.cache/pip,rw \
     for ext in $APP_SRC_DIR/extensions/*/requirements.txt; do \
