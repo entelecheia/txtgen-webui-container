@@ -30,7 +30,7 @@ ARG ARG_APP_DIRNAME="txtgen-webui"
 ENV APP_INSTALL_ROOT $ARG_APP_INSTALL_ROOT
 ENV APP_DIRNAME $ARG_APP_DIRNAME
 ENV APP_SRC_DIR=${APP_INSTALL_ROOT}/${APP_DIRNAME}
-ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/.venvs/${APP_DIRNAME}
+ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/venv
 ENV APP_WORKSPACE_ROOT=${APP_INSTALL_ROOT}/workspace
 ENV PATH="$APP_VIRTUAL_ENV/bin:$PATH"
 
@@ -47,6 +47,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     python3.10 -m venv ${APP_VIRTUAL_ENV} &&\
     pip install -r ./scripts/requirements-base.txt \
     --extra-index-url https://download.pytorch.org/whl/${TORCH_CUDNN}
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install xformers
 
 RUN cp ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cuda118.so ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cpu.so
 
@@ -84,7 +86,7 @@ ARG ARG_APP_DIRNAME="txtgen-webui"
 ENV APP_INSTALL_ROOT $ARG_APP_INSTALL_ROOT
 ENV APP_DIRNAME $ARG_APP_DIRNAME
 ENV APP_SRC_DIR=${APP_INSTALL_ROOT}/${APP_DIRNAME}
-ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/.venvs/${APP_DIRNAME}
+ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/venv
 ENV APP_WORKSPACE_ROOT=${APP_INSTALL_ROOT}/workspace
 ARG ARG_WORKSPACE_ROOT="/workspace"
 ENV WORKSPACE_ROOT $ARG_WORKSPACE_ROOT
