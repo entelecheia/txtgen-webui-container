@@ -1,5 +1,11 @@
 <!--next-version-placeholder-->
 
+## v0.4.0 (2023-10-11)
+
+### Feature
+
+* **dockerfile:** Simplify docker layers by removing separate build stage, add essential packages and workspace setup ([`4575bcf`](https://github.com/entelecheia/txtgen-webui-container/commit/4575bcfca837e4afac272464d338e08f9b759d90))
+
 ## v0.3.0 (2023-10-11)
 
 ### Feature
