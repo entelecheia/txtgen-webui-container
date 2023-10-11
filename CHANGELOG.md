@@ -1,5 +1,12 @@
 <!--next-version-placeholder-->
 
+## v0.5.0 (2023-10-11)
+
+### Feature
+
+* **server:** Allow passing CLI arguments to server script ([`f4ed84d`](https://github.com/entelecheia/txtgen-webui-container/commit/f4ed84d9a9162b851e4ec4868cbfa5a5e343a97b))
+* **docker:** Add listen and api options to server launch command ([`ac93322`](https://github.com/entelecheia/txtgen-webui-container/commit/ac93322863c62adf5790dab41a9ba18231d04835))
+
 ## v0.4.0 (2023-10-11)
 
 ### Feature

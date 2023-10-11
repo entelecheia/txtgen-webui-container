@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "txtgen-webui"
-version = "0.4.0"
+version = "0.5.0"
 description = "A Docker container for text-generation-webui, a Gradio web UI for running Large Language Models like GPT-J, OPT, GALACTICA, LLaMA, and Pygmalion."
 authors = ["Young Joon Lee <entelecheia@hotmail.com>"]
 license = "MIT"
