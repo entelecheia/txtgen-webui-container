@@ -1,15 +1,16 @@
 # Sets the base image for subsequent instructions
 ARG ARG_BUILD_FROM="nvidia/cuda:11.8.0-cudnn8-runtime-ubuntu22.04"
 
-## Builder stage
-FROM $ARG_BUILD_FROM as builder
+FROM $ARG_BUILD_FROM
 
 # Setting this argument prevents interactive prompts during the build process
 ARG DEBIAN_FRONTEND=noninteractive
 # Updates the image and installs necessary packages
 RUN apt-get update --fix-missing \
-    && apt-get install -y curl git \
-    python3.10-venv build-essential \
+    && apt-get install -y curl wget jq sudo gosu git \
+    python3.10-venv python3-pip build-essential \
+    locales locales-all fontconfig fonts-nanum libportaudio2 libasound-dev make g++ ffmpeg \
+    tzdata openssh-server \
     # Cleans up unnecessary packages to reduce image size
     && apt-get autoremove -y \
     && apt-get clean -y
@@ -32,6 +33,11 @@ ENV APP_DIRNAME $ARG_APP_DIRNAME
 ENV APP_SRC_DIR=${APP_INSTALL_ROOT}/${APP_DIRNAME}
 ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/venv
 ENV APP_WORKSPACE_ROOT=${APP_INSTALL_ROOT}/workspace
+ARG ARG_WORKSPACE_ROOT="/workspace"
+ENV WORKSPACE_ROOT $ARG_WORKSPACE_ROOT
+# Sets up the workspace for the user
+RUN mkdir -p $WORKSPACE_ROOT/projects
+
 ENV PATH="$APP_VIRTUAL_ENV/bin:$PATH"
 
 ARG ARG_TORCH_CUDNN=cu118
@@ -51,52 +57,6 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install xformers
 
 RUN cp ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cuda118.so ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cpu.so
-
-#### Runtime stage ---------------------------------------
-
-# Runtime image (copy built virtual environment)
-FROM library/ubuntu:22.04 AS runtime
-
-
-# Sets labels for the image
-LABEL org.opencontainers.image.source="https://github.com/entelecheia/txtgen-webui-container"
-LABEL org.opencontainers.image.description="A Docker container for text-generation-webui, a Gradio web UI for running Large Language Models like GPT-J, OPT, GALACTICA, LLaMA, and Pygmalion."
-LABEL org.opencontainers.image.licenses="MIT"
-
-# Setting this argument prevents interactive prompts during the build process
-ARG DEBIAN_FRONTEND=noninteractive
-# Updates the image and installs necessary packages
-RUN apt-get update --fix-missing \
-    && apt-get install -y curl wget jq sudo gosu git \
-    python3.10-venv python3-pip build-essential \
-    locales locales-all fontconfig fonts-nanum libportaudio2 libasound-dev make g++ ffmpeg \
-    tzdata openssh-server \
-    # Cleans up unnecessary packages to reduce image size
-    && apt-get autoremove -y \
-    && apt-get clean -y
-
-# Sets Python environment variables
-ENV PIP_DEFAULT_TIMEOUT 100
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-
-# Setting ARGs and ENVs for the app
-ARG ARG_APP_INSTALL_ROOT="/opt"
-ARG ARG_APP_DIRNAME="txtgen-webui"
-ENV APP_INSTALL_ROOT $ARG_APP_INSTALL_ROOT
-ENV APP_DIRNAME $ARG_APP_DIRNAME
-ENV APP_SRC_DIR=${APP_INSTALL_ROOT}/${APP_DIRNAME}
-ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/venv
-ENV APP_WORKSPACE_ROOT=${APP_INSTALL_ROOT}/workspace
-ARG ARG_WORKSPACE_ROOT="/workspace"
-ENV WORKSPACE_ROOT $ARG_WORKSPACE_ROOT
-# Sets up the workspace for the user
-RUN mkdir -p $WORKSPACE_ROOT/projects
-
-ENV PATH="$APP_VIRTUAL_ENV/bin:$PATH"
-
-# Copy the virtual environment from the builder stage
-COPY --link --from=builder ${APP_VIRTUAL_ENV} ${APP_VIRTUAL_ENV}
 
 # Sets the time zone within the container
 ENV TZ="Asia/Seoul"
@@ -119,8 +79,6 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
     && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
-
-
 
 RUN chown -R $USERNAME:$USERNAME $WORKSPACE_ROOT
 
