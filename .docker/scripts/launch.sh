@@ -26,10 +26,10 @@ if [[ -n "$SSH_PUB_KEY" ]] && [[ ! -d "${HOME}/.ssh" ]]; then
     service ssh start
 fi
 
-if [ -f "$APP_WORKSPACE_ROOT/scripts/requirements.txt" ]; then
-    pip3 install -r "$APP_WORKSPACE_ROOT/scripts/requirements.txt"
+if [ -f "$APP_INSTALL_ROOT/scripts/requirements.txt" ]; then
+    pip3 install -r "$APP_INSTALL_ROOT/scripts/requirements.txt"
 fi
-cd "${APP_SRC_DIR}" || echo "Failed to change directory to ${APP_SRC_DIR}. Continuing..."
+cd "${APP_DIR}" || echo "Failed to change directory to ${APP_DIR}. Continuing..."
 
 # Run the CMD as the Container User (not root).
 exec gosu "${USER}" python3 server.py ${CLI_ARGS}
