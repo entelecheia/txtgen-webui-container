@@ -6,14 +6,9 @@ FROM $ARG_BUILD_FROM
 ARG ARG_USERNAME="app"
 ARG ARG_USER_UID=9001
 ARG ARG_USER_GID=$ARG_USER_UID
-ARG ARG_WORKSPACE_ROOT="/workspace"
 ENV USERNAME $ARG_USERNAME
 ENV USER_UID $ARG_USER_UID
 ENV USER_GID $ARG_USER_GID
-ENV WORKSPACE_ROOT $ARG_WORKSPACE_ROOT
-
-# Sets up the workspace for the user
-RUN if [ ! -d $WORKSPACE_ROOT/projects ]; then mkdir -p $WORKSPACE_ROOT/projects; fi
 
 # Setting ARGs and ENVs for the app
 ARG ARG_APP_SOURCE_REPO="entelecheia/text-generation-webui"
@@ -27,36 +22,34 @@ ENV APP_DIRNAME $ARG_APP_DIRNAME
 ENV APP_SOURCE_BRANCH $ARG_APP_SOURCE_BRANCH
 ENV APP_SERVICE_NAME $ARG_APP_SERVICE_NAME
 ENV APP_SRC_DIR=${APP_INSTALL_ROOT}/${APP_DIRNAME}
+ENV APP_DIR=${APP_INSTALL_ROOT}/app
 ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/venv
 ENV APP_WORKSPACE_ROOT=${APP_INSTALL_ROOT}/workspace
 
-# Clones the app repository from GitHub
-RUN git clone --branch $APP_SOURCE_BRANCH https://github.com/${ARG_APP_SOURCE_REPO}.git ${APP_SRC_DIR} &&\
-    cd ${APP_SRC_DIR} &&\
-    git checkout $APP_SOURCE_BRANCH
+# Setting ARGs and ENVs for user creation and workspace setup
+ARG ARG_USERNAME="app"
+ARG ARG_USER_UID=9001
+ARG ARG_USER_GID=$ARG_USER_UID
+ENV USERNAME $ARG_USERNAME
+ENV USER_UID $ARG_USER_UID
+ENV USER_GID $ARG_USER_GID
 
-# Install main requirements
-RUN --mount=type=cache,target=/root/.cache/pip,rw \
-    pip3 install -r $APP_SRC_DIR/requirements.txt
+# Creates a non-root user with sudo privileges
+RUN groupadd --gid $USER_GID $USERNAME \
+    && adduser --uid $USER_UID --gid $USER_GID --force-badname --disabled-password --gecos "" $USERNAME  \
+    && echo "$USERNAME:$USERNAME" | chpasswd \
+    && adduser $USERNAME sudo \
+    && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers \
+    && echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
 
-RUN cp ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cuda118.so ${APP_VIRTUAL_ENV}/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cpu.so
-
-# Install extension requirements
-RUN --mount=type=cache,target=/root/.cache/pip,rw \
-    for ext in $APP_SRC_DIR/extensions/*/requirements.txt; do \
-    cd "$(dirname "$ext")"; \
-    pip3 install -r requirements.txt; \
-    done
-
-RUN chown -R $USERNAME:$USERNAME $WORKSPACE_ROOT
+# Sets the working directory to workspace root
+WORKDIR $APP_INSTALL_ROOT
+# Copies scripts from host into the image
+COPY ./.docker/scripts/ ./scripts/
 RUN chown -R $USERNAME:$USERNAME $APP_INSTALL_ROOT
 
 ENV CLI_ARGS=""
-
-# Sets the working directory to workspace root
-WORKDIR $APP_WORKSPACE_ROOT
-# Copies scripts from host into the image
-COPY ./.docker/scripts/ ./scripts/
 
 # Specifies the command that will be executed when the container is run
 CMD ["bash"]
