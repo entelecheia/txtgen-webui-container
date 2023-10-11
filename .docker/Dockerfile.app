@@ -27,21 +27,17 @@ ENV APP_DIRNAME $ARG_APP_DIRNAME
 ENV APP_SOURCE_BRANCH $ARG_APP_SOURCE_BRANCH
 ENV APP_SERVICE_NAME $ARG_APP_SERVICE_NAME
 ENV APP_SRC_DIR=${APP_INSTALL_ROOT}/${APP_DIRNAME}
-ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/.venvs/${APP_DIRNAME}
+ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/venv
 ENV APP_WORKSPACE_ROOT=${APP_INSTALL_ROOT}/workspace
-
-# Sets the working directory to workspace root
-WORKDIR $WORKSPACE_ROOT
-# Copies scripts from host into the image
-COPY ./.docker/scripts/ ./scripts/
-
-# Installs Python dependencies listed in requirements.txt
-RUN if [ -f ./scripts/requirements.txt ]; then pip3 install -r ./scripts/requirements.txt; fi
 
 # Clones the app repository from GitHub
 RUN git clone --branch $APP_SOURCE_BRANCH https://github.com/${ARG_APP_SOURCE_REPO}.git ${APP_SRC_DIR} &&\
     cd ${APP_SRC_DIR} &&\
     git checkout $APP_SOURCE_BRANCH
+
+# Install main requirements
+RUN --mount=type=cache,target=/root/.cache/pip,rw \
+    pip3 install -r $APP_SRC_DIR/requirements.txt
 
 # Install extension requirements
 RUN --mount=type=cache,target=/root/.cache/pip,rw \
@@ -52,6 +48,13 @@ RUN --mount=type=cache,target=/root/.cache/pip,rw \
 
 RUN chown -R $USERNAME:$USERNAME $WORKSPACE_ROOT
 RUN chown -R $USERNAME:$USERNAME $APP_INSTALL_ROOT
+
+ENV CLI_ARGS=""
+
+# Sets the working directory to workspace root
+WORKDIR $APP_WORKSPACE_ROOT
+# Copies scripts from host into the image
+COPY ./.docker/scripts/ ./scripts/
 
 # Specifies the command that will be executed when the container is run
 CMD ["bash"]
