@@ -1,5 +1,13 @@
 <!--next-version-placeholder-->
 
+## v0.6.0 (2023-10-11)
+
+### Feature
+
+* **docker:** Add development base image ([`5cbf144`](https://github.com/entelecheia/txtgen-webui-container/commit/5cbf144a5f7695d6ccbfa873de8d933b84509a3d))
+* **docker:** Restructured Dockerfile for builder and runtime stages ([`2dcbeab`](https://github.com/entelecheia/txtgen-webui-container/commit/2dcbeabde82531ba40e33fb666849292354a58e7))
+* **docker:** Install requirements from requirements.txt in launch.sh ([`e168d18`](https://github.com/entelecheia/txtgen-webui-container/commit/e168d18552aaafe0dcb71779ff964e7609f746d2))
+
 ## v0.5.0 (2023-10-11)
 
 ### Feature
