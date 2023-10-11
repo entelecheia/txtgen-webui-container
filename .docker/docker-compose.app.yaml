@@ -58,6 +58,13 @@ services:
       # Maps directories from the host to the container
       - "$PWD/.docker/scripts:$CONTAINER_WORKSPACE_ROOT/scripts"
       - ${HF_HOME}:${APP_HF_HOME}
+      - $PWD/workspace/characters:$APP_SRC_DIR/characters
+      - $PWD/workspace/loras:$APP_SRC_DIR/loras
+      - $PWD/workspace/models:$APP_SRC_DIR/models
+      - $PWD/workspace/presets:$APP_SRC_DIR/presets
+      - $PWD/workspace/prompts:$APP_SRC_DIR/prompts
+      - $PWD/workspace/softprompts:$APP_SRC_DIR/softprompts
+      - $PWD/workspace/training:$APP_SRC_DIR/training
     deploy:
       resources:
         reservations:
