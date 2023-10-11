@@ -12,10 +12,10 @@ services:
       args:
         ARG_BUILD_FROM: $BUILD_FROM
         ARG_DEV_BUILD_FROM: $DEV_BUILD_FROM
-        ARG_USERNAME: $CONTAINER_USERNAME
-        ARG_USER_UID: $CONTAINER_USER_UID
-        ARG_USER_GID: $CONTAINER_USER_GID
-        ARG_WORKSPACE_ROOT: $CONTAINER_WORKSPACE_ROOT
+        ARG_APP_SOURCE_REPO: $APP_SOURCE_REPO
+        ARG_APP_INSTALL_ROOT: $APP_INSTALL_ROOT
+        ARG_APP_DIRNAME: $APP_DIRNAME
+        ARG_APP_SOURCE_BRANCH: $APP_SOURCE_BRANCH
     # Sets the image name for the built image
     image: $IMAGE_NAME:$IMAGE_TAG
     # Sets the hostname of the container
