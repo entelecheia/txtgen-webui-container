@@ -30,4 +30,4 @@ fi
 cd "${APP_SRC_DIR}" || echo "Failed to change directory to ${APP_SRC_DIR}. Continuing..."
 
 # Run the CMD as the Container User (not root).
-exec gosu "${USER}" python3 server.py
+exec gosu "${USER}" python3 server.py --listen --api
