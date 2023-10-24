@@ -1,4 +1,4 @@
-accelerate==0.23.*
+accelerate==0.24.*
 autoawq==0.1.4
 bitsandbytes==0.41.1
 datasets
