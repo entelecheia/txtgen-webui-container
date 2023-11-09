@@ -1,5 +1,11 @@
 <!--next-version-placeholder-->
 
+## v0.8.0 (2023-11-09)
+
+### Feature
+
+* **docker:** Upgrade base image to nvidia/cuda:12.1.0-devel-ubuntu22.04 ([`6135409`](https://github.com/entelecheia/txtgen-webui-container/commit/613540926b26648d40b767c75a04beb6ad5a768b))
+
 ## v0.7.0 (2023-10-11)
 
 ### Feature
