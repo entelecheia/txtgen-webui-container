@@ -11,7 +11,7 @@ ENV USER_UID $ARG_USER_UID
 ENV USER_GID $ARG_USER_GID
 
 # Setting ARGs and ENVs for the app
-ARG ARG_APP_SOURCE_REPO="entelecheia/text-generation-webui"
+ARG ARG_APP_SOURCE_REPO="oobabooga/text-generation-webui"
 ARG ARG_APP_INSTALL_ROOT="/opt"
 ARG ARG_APP_DIRNAME="txtgen-webui"
 ARG ARG_APP_SOURCE_BRANCH="main"
