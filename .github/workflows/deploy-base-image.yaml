@@ -83,6 +83,7 @@ jobs:
             ARG_USER_UID=${{ env.CONTAINER_USER_UID }}
             ARG_USER_GID=${{ env.CONTAINER_USER_GID }}
             ARG_WORKSPACE_ROOT=${{ env.CONTAINER_WORKSPACE_ROOT }}
+            ARG_WEBUI_VERSION=${{ env.WEBUI_VERSION }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
