@@ -1,5 +1,6 @@
 # Sets the base image for subsequent instructions
-ARG ARG_BUILD_FROM="nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04"                                     # The base image for the Docker build
+# The base image for the Docker build
+ARG ARG_BUILD_FROM=" nvidia/cuda:12.1.0-devel-ubuntu22.04"
 
 ## Builder stage
 FROM $ARG_BUILD_FROM as builder-base
@@ -25,7 +26,7 @@ ENV APP_INSTALL_ROOT $ARG_APP_INSTALL_ROOT
 ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/venv
 ENV PATH="$APP_VIRTUAL_ENV/bin:$PATH"
 
-ARG ARG_TORCH_CUDNN=cu118
+ARG ARG_TORCH_CUDNN=cu121
 ENV TORCH_CUDNN=$ARG_TORCH_CUDNN
 
 # Install pytorch before all other pip packages
@@ -56,6 +57,9 @@ ENV APP_DIR=${APP_INSTALL_ROOT}/app
 ENV APP_VIRTUAL_ENV=${APP_INSTALL_ROOT}/venv
 ENV APP_WORKSPACE_ROOT=${APP_INSTALL_ROOT}/workspace
 
+ARG ARG WEBUI_VERSION
+ENV WEBUI_VERSION $ARG_WEBUI_VERSION
+
 # Sets the working directory to workspace root
 WORKDIR $APP_INSTALL_ROOT
 # Copies scripts from host into the image
@@ -64,7 +68,7 @@ COPY ./.docker/scripts/ ./scripts/
 # Clones the app repository from GitHub
 RUN git clone --branch $APP_SOURCE_BRANCH https://github.com/${ARG_APP_SOURCE_REPO}.git ${APP_SRC_DIR} &&\
     cd ${APP_SRC_DIR} &&\
-    git checkout $APP_SOURCE_BRANCH
+    git reset --hard ${WEBUI_VERSION}
 
 ENV LLAMA_CUBLAS=1
 # Copy source to app
@@ -95,7 +99,8 @@ RUN pip install flash-attn --no-build-isolation
 #### Runtime stage ---------------------------------------
 
 # Runtime image (copy built virtual environment)
-FROM $ARG_BUILD_FROM AS runtime
+# FROM $ARG_BUILD_FROM AS runtime
+FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04 AS runtime
 
 # Sets labels for the image
 LABEL org.opencontainers.image.source="https://github.com/entelecheia/txtgen-webui-container"
@@ -136,6 +141,8 @@ COPY --from=app-builder ${APP_VIRTUAL_ENV} ${APP_VIRTUAL_ENV}
 # Copy app and src
 COPY --from=app-builder ${APP_DIR} ${APP_DIR}
 COPY --from=app-builder ${APP_SRC_DIR} ${APP_SRC_DIR}
+
+RUN cp "$APP_VIRTUAL_ENV/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cuda121.so" "$APP_VIRTUAL_ENV/lib/python3.10/site-packages/bitsandbytes/libbitsandbytes_cpu.so"
 
 # Sets the time zone within the container
 ENV TZ="Asia/Seoul"
