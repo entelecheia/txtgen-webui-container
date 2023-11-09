@@ -33,6 +33,7 @@ services:
       SSH_PUB_KEY: $SSH_PUB_KEY
       IMAGE_VARIANT: $IMAGE_VARIANT
       CLI_ARGS: $APP_CLI_ARGS
+      HF_ACCESS_TOKEN: $HF_ACCESS_TOKEN
     ulimits:
       # Sets the stack size and memory lock limits
       stack: 67108864
