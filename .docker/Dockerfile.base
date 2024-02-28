@@ -100,7 +100,7 @@ RUN pip install flash-attn --no-build-isolation
 
 # Runtime image (copy built virtual environment)
 # FROM $ARG_BUILD_FROM AS runtime
-FROM nvidia/cuda:12.1.0-runtime-ubuntu22.04 AS runtime
+FROM nvidia/cuda:12.3.2-runtime-ubuntu22.04 AS runtime
 
 # Sets labels for the image
 LABEL org.opencontainers.image.source="https://github.com/entelecheia/txtgen-webui-container"
